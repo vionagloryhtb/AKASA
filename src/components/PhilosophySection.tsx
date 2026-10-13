@@ -21,8 +21,8 @@ export const PhilosophySection: React.FC<PhilosophySectionProps> = ({ onGoToCurh
           >
             Filosofi & Identitas AKASA
           </h1>
-          <p className="text-base sm:text-lg text-[#221F1F]/75 leading-[1.6] max-w-2xl mx-auto font-sans">
-            &ldquo;Karena di balik setiap seragam putih abu-abu, ada manusia yang berhak didengar tanpa harus selalu dipaksa kuat.&rdquo;
+          <p className="text-base sm:text-lg text-[#221F1F]/75 leading-[1.6] max-w-4xl mx-auto font-sans whitespace-normal sm:whitespace-nowrap">
+            &ldquo;Karena di balik setiap seragam itu, ada manusia yang berhak didengar tanpa harus selalu dipaksa kuat.&rdquo;
           </p>
         </div>
 
@@ -34,7 +34,7 @@ export const PhilosophySection: React.FC<PhilosophySectionProps> = ({ onGoToCurh
             </div>
 
             <h2 className="font-geometric text-xl font-bold text-[#221F1F] mb-2">
-              Makna di Balik &ldquo;Akasa&rdquo;
+              Makna di Balik &ldquo;AKASA&rdquo;
             </h2>
             <p className="text-sm text-[#221F1F]/75 leading-[1.6] mb-5">
               Dalam bahasa Sansekerta, <em>Akasa</em> berarti angkasa raya: ruang lapang tanpa batas tempat badai dan awan gelap bisa lewat dan reda tanpa pernah mengubah ketenangan langit aslinya.
@@ -53,7 +53,7 @@ export const PhilosophySection: React.FC<PhilosophySectionProps> = ({ onGoToCurh
                 </h3>
               </div>
               <p className="text-sm text-[#221F1F]/75 leading-[1.6]">
-                Mewujudkan ekosistem belajar yang sehat secara emosional bagi pelajar SMA di Indonesia, di mana kesehatan mental dipandang setara pentingnya dengan prestasi akademik.
+                Mewujudkan ekosistem belajar yang sehat secara emosional bagi pelajar, di mana kesehatan mental dipandang setara pentingnya dengan prestasi akademik.
               </p>
             </div>
 
@@ -135,8 +135,8 @@ export const PhilosophySection: React.FC<PhilosophySectionProps> = ({ onGoToCurh
               <h3 className="text-sm sm:text-base font-bold text-[#221F1F] font-geometric">
                 Butuh Bantuan Lebih Lanjut?
               </h3>
-              <p className="text-xs sm:text-sm text-[#221F1F]/70 mt-1 leading-[1.6]">
-                Kamu bisa menghubungi Guru Bimbingan Konseling (BK) di sekolahmu atau layanan Hotline Kesehatan Mental Indonesia.
+              <p className="text-xs sm:text-sm text-[#221F1F]/70 mt-1 leading-[1.6] whitespace-normal sm:whitespace-nowrap">
+                Kamu bisa menghubungi orang terdekat, BK, maupun profesional lainnya di lingkunganmu.
               </p>
             </div>
 

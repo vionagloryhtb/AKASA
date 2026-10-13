@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Smile, Check, ArrowRight } from 'lucide-react';
+import { Smile, ArrowRight } from 'lucide-react';
 
 interface HeroInteractiveVisualProps {
   onStartScreening: () => void;
@@ -42,7 +42,7 @@ export const HeroInteractiveVisual: React.FC<HeroInteractiveVisualProps> = ({
       <div className="relative bg-[#F0EEF8]/90 backdrop-blur-md rounded-3xl border border-[#4A3E7D]/12 p-6 sm:p-8 md:p-9 transition-all duration-300 ease-in-out hover:-translate-y-1 hover:shadow-soft-float h-full flex flex-col justify-between text-left">
         
         {/* Mockup Header: Stylized High School Student Safe Space */}
-        <div className="flex items-start justify-between pb-5 mb-2 border-b border-[#4A3E7D]/10 gap-4">
+        <div className="flex items-center justify-between pb-5 mb-2 border-b border-[#4A3E7D]/10 gap-4">
           <div className="flex items-center gap-3.5">
             <div className="relative shrink-0">
               <div className="w-12 h-12 rounded-2xl bg-[#4A3E7D] flex items-center justify-center text-white shadow-xs">
@@ -51,14 +51,9 @@ export const HeroInteractiveVisual: React.FC<HeroInteractiveVisualProps> = ({
               <span className="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 rounded-full bg-[#1E7E45] border-2 border-[#F0EEF8]" />
             </div>
 
-            <div>
-              <h3 className="font-geometric text-base font-bold text-[#221F1F]">
-                Teman Refleksi AKASA
-              </h3>
-              <p className="text-xs text-[#221F1F]/70 mt-1 leading-[1.6]">
-                Ruang aman privat • Terbuka mendengar tanpa penilaian
-              </p>
-            </div>
+            <h3 className="font-geometric text-base sm:text-lg font-bold text-[#221F1F]">
+              Teman Refleksi AKASA
+            </h3>
           </div>
 
           <div className="shrink-0 text-right">
@@ -126,12 +121,7 @@ export const HeroInteractiveVisual: React.FC<HeroInteractiveVisualProps> = ({
         </div>
 
         {/* Direct Action Link */}
-        <div className="pt-4 border-t border-[#4A3E7D]/10 flex items-center justify-between">
-          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#E2F1E8] text-[#1E7E45] border border-[#1E7E45]/20 text-xs font-semibold">
-            <Check className="w-3.5 h-3.5 stroke-[2.5]" />
-            <span>Respons privat & personal</span>
-          </span>
-
+        <div className="pt-4 border-t border-[#4A3E7D]/10 flex items-center justify-end">
           <button
             type="button"
             onClick={onStartScreening}

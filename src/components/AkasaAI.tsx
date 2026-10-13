@@ -117,9 +117,6 @@ export const AkasaAI: React.FC<AkasaAIProps> = ({
               <p className="text-xs font-bold uppercase tracking-wider text-[#4A3E7D] font-geometric">
                 Ruang Curhat & Refleksi Emosi
               </p>
-              <p className="text-xs sm:text-sm text-[#221F1F]/70 mt-0.5 leading-[1.6]">
-                Ruang aman privat tanpa penghakiman. Respons hangat, personal, dan ringkas untuk layar HP.
-              </p>
             </div>
           </div>
 
@@ -405,13 +402,10 @@ export const AkasaAI: React.FC<AkasaAIProps> = ({
             )}
 
             {/* Prinsip Privasi Reassurance */}
-            <div className="mt-6 pt-5 border-t border-[#4A3E7D]/10 flex flex-col sm:flex-row items-center justify-between gap-2.5 text-xs text-[#221F1F]/65 text-center sm:text-left">
+            <div className="mt-6 pt-5 border-t border-[#4A3E7D]/10 flex items-center justify-center sm:justify-start gap-2.5 text-xs text-[#221F1F]/65 text-center sm:text-left">
               <span className="flex items-center gap-1.5 font-medium text-[#221F1F]/85">
                 <ShieldCheck className="w-4 h-4 text-[#1E7E45] shrink-0" />
                 <span>Prinsip Privasi: Ceritamu 100% rahasia dan tidak dipublikasikan ke siapapun.</span>
-              </span>
-              <span className="text-[11px] text-[#4A3E7D] font-semibold bg-[#E8E2F7] px-3 py-1 rounded-full border border-[#4A3E7D]/15">
-                Ruang Refleksi Privat
               </span>
             </div>
           </div>

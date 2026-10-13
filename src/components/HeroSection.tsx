@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Check, ShieldCheck } from 'lucide-react';
+import { ShieldCheck } from 'lucide-react';
 import { HeroInteractiveVisual } from './HeroInteractiveVisual';
 import { HeroQuickToolsCard } from './HeroQuickToolsCard';
 
@@ -78,29 +78,15 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
             </span>
           </h1>
 
-          {/* Sub-Headline Deskripsi Singkat: Line-Height 1.6 untuk Kenyamanan Membaca */}
-          <p
-            id="hero-subheadline"
-            className="text-base sm:text-lg text-[#221F1F]/75 max-w-2xl mx-auto font-normal leading-[1.6] mb-8 font-sans"
-          >
-            Media pembelajaran sekaligus asisten AI pribadi yang siap membantu siswa SMA mengenali emosi dan menemukan langkah penanganan yang sesuai untuk dirinya.
-          </p>
-
-          {/* 3 Badges Horizontal Rata Tengah dengan Palet Hangat & Organik */}
-          <div className="flex flex-wrap items-center justify-center gap-3">
+          {/* Badges Horizontal Rata Tengah dengan Palet Hangat & Organik */}
+          <div className="flex flex-wrap items-center justify-center gap-3 mb-10">
             <span className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-[#E2F1E8] text-[#1E7E45] border border-[#1E7E45]/20 text-xs font-semibold shadow-2xs">
               <ShieldCheck className="w-3.5 h-3.5 text-[#1E7E45] stroke-[2.2]" />
               <span>Kerahasiaan Terjaga</span>
             </span>
 
-            <span className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-[#E8E2F7]/70 text-[#4A3E7D] border border-[#4A3E7D]/20 text-xs font-semibold shadow-2xs">
-              <Check className="w-3.5 h-3.5 text-[#4A3E7D] stroke-[2.5]" />
+            <span className="inline-flex items-center px-3.5 py-1.5 rounded-full bg-[#E8E2F7]/70 text-[#4A3E7D] border border-[#4A3E7D]/20 text-xs font-semibold shadow-2xs">
               <span>Tanpa Registrasi</span>
-            </span>
-
-            <span className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-[#E8E2F7]/70 text-[#4A3E7D] border border-[#4A3E7D]/20 text-xs font-semibold shadow-2xs">
-              <Check className="w-3.5 h-3.5 text-[#4A3E7D] stroke-[2.5]" />
-              <span>Khusus Pelajar SMA</span>
             </span>
           </div>
         </div>

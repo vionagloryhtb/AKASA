@@ -84,9 +84,6 @@ export const EmotionEducation: React.FC<EmotionEducationProps> = ({
               <p className="text-xs font-bold uppercase tracking-wider text-[#4A3E7D] font-geometric">
                 Edukasi & Pembelajaran
               </p>
-              <p className="text-xs sm:text-sm text-[#221F1F]/75 mt-0.5 leading-[1.6]">
-                Fokus belajar mengenali ragam emosi dan tips manajemen stres akademik dengan bahasa santai khas anak SMA.
-              </p>
             </div>
           </div>
 
@@ -106,22 +103,16 @@ export const EmotionEducation: React.FC<EmotionEducationProps> = ({
         </div>
 
         {/* Section Header Literasi Emosi: Modern Sans-Serif & Spacious */}
-        <div className="text-center max-w-2xl mx-auto mb-12 md:mb-16">
+        <div className="text-center max-w-4xl mx-auto mb-12 md:mb-16">
           <span className="text-xs font-bold tracking-widest text-[#4A3E7D] uppercase mb-2 block font-geometric">
             Kenali Sinyal Tubuh & Pikiran
           </span>
           <h2
             id="education-title"
-            className="font-geometric text-2xl sm:text-4xl font-extrabold text-[#221F1F] tracking-tight mb-3.5"
+            className="font-geometric text-2xl sm:text-3xl md:text-4xl font-extrabold text-[#221F1F] tracking-tight whitespace-normal sm:whitespace-nowrap"
           >
             5 Ragam Emosi Stres Akademik Pelajar SMA
           </h2>
-          <p
-            id="education-subtitle"
-            className="text-sm sm:text-base text-[#221F1F]/70 leading-[1.6]"
-          >
-            Sering kali kita hanya merasa lelah tanpa tahu persis apa penyebabnya. Klik kartu untuk membuka panduan sains otak dan teknik pertolongan pertama:
-          </p>
         </div>
 
         {/* 5 Cards Grid dengan Warna Aksen & Mikro-Interaksi Halus */}
@@ -144,24 +135,7 @@ export const EmotionEducation: React.FC<EmotionEducationProps> = ({
                   style={{ backgroundColor: item.accentColor.primary }}
                 />
 
-                <div>
-                  {/* Card Header Tag */}
-                  <div className="flex items-center justify-between gap-2 mb-3.5 pt-1">
-                    <span
-                      className="text-xs font-bold px-3 py-1 rounded-full border shadow-2xs"
-                      style={{
-                        backgroundColor: item.accentColor.badgeBg,
-                        color: item.accentColor.badgeText,
-                        borderColor: item.accentColor.border
-                      }}
-                    >
-                      {item.badgeLabel}
-                    </span>
-                    <span className="text-[11px] text-[#221F1F]/45 font-medium">
-                      Psikoedukasi
-                    </span>
-                  </div>
-
+                <div className="pt-2">
                   {/* Emotion Title & Subtitle */}
                   <h3 className="font-geometric text-xl sm:text-2xl font-bold text-[#221F1F] mb-1">
                     {item.label}
@@ -202,14 +176,14 @@ export const EmotionEducation: React.FC<EmotionEducationProps> = ({
                   <button
                     id={`learn-more-${item.id}`}
                     onClick={() => handleOpenDetailModal(item)}
-                    className="inline-flex items-center gap-1.5 text-xs font-bold px-3.5 py-2 rounded-xl transition-all duration-300 ease-in-out cursor-pointer active:scale-95 group/btn"
+                    className="inline-flex items-center gap-1.5 text-xs font-bold px-3.5 py-2 rounded-xl transition-all duration-300 ease-in-out cursor-pointer active:scale-95 group/btn whitespace-nowrap shrink-0"
                     style={{
                       backgroundColor: item.accentColor.bgSoft,
                       color: item.accentColor.badgeText,
                       border: `1px solid ${item.accentColor.border}`
                     }}
                   >
-                    <span>Pelajari Selengkapnya ➔</span>
+                    <span className="whitespace-nowrap">Pelajari Selengkapnya ➔</span>
                   </button>
 
                   <button
@@ -292,9 +266,6 @@ export const EmotionEducation: React.FC<EmotionEducationProps> = ({
             <h4 className="text-sm sm:text-base font-bold text-[#221F1F] font-geometric">
               Ingin menumpahkan isi hati atau tugas yang lagi bikin cemas?
             </h4>
-            <p className="text-xs sm:text-sm text-[#221F1F]/70 mt-1 leading-[1.6]">
-              Bagian ini dikhususkan untuk membaca materi psikoedukasi. Untuk curhat privat dan mendapat respons hangat AI, silakan masuk ke Ruang Curhat.
-            </p>
           </div>
           {onGoToCurhat && (
             <button

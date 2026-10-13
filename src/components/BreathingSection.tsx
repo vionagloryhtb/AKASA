@@ -94,16 +94,16 @@ export const BreathingSection: React.FC<BreathingSectionProps> = ({ onGoToCurhat
 
       <div className="max-w-5xl mx-auto px-4 sm:px-6 relative z-10">
         {/* Section Header: Modern Geometric Sans-Serif */}
-        <div className="text-center max-w-2xl mx-auto mb-12">
+        <div className="text-center max-w-4xl mx-auto mb-12">
           <div className="inline-flex items-center gap-2 text-xs font-bold tracking-widest text-[#4A3E7D] uppercase mb-3 font-geometric">
             <Wind className="w-4 h-4" />
             <span>Pemberhentian Sejenak</span>
           </div>
-          <h2 className="font-geometric text-3xl sm:text-4xl font-extrabold text-[#221F1F] tracking-tight mb-4">
+          <h2 className="font-geometric text-2xl sm:text-3xl md:text-4xl font-extrabold text-[#221F1F] tracking-tight mb-4 whitespace-normal sm:whitespace-nowrap">
             Teknik Napas 4-7-8 untuk Meredakan Ketegangan
           </h2>
-          <p className="text-base text-[#221F1F]/75 leading-[1.6]">
-            Saat kepalamu terasa penuh oleh tumpukan ujian dan tugas, latihan pernapasan ritmis ini terbukti secara biologis membantu mengaktifkan sistem saraf parasimpatis dalam waktu kurang dari 60 detik.
+          <p className="text-sm sm:text-base text-[#221F1F]/75 leading-[1.6] max-w-xl mx-auto">
+            Saat kepala mau pecah karena tugas dan ujian, coba tarik napas teratur. Tidak sampai semenit, tubuhmu bakal langsung lebih tenang.
           </p>
         </div>
 
@@ -128,21 +128,25 @@ export const BreathingSection: React.FC<BreathingSectionProps> = ({ onGoToCurhat
                 />
 
                 {/* Center Core */}
-                <div className="relative z-10 w-28 h-28 sm:w-32 sm:h-32 rounded-full bg-white shadow-xs flex flex-col items-center justify-center border border-[#4A3E7D]/10">
+                <div className="relative z-10 w-28 h-28 sm:w-32 sm:h-32 rounded-full bg-white shadow-xs flex flex-col items-center justify-center border border-[#4A3E7D]/10 text-center">
                   <span className="font-geometric text-3xl sm:text-4xl font-black text-[#4A3E7D]">
                     {isActive ? `${countdown}s` : '4-7-8'}
                   </span>
-                  <span className="text-[11px] font-semibold tracking-wider uppercase text-[#221F1F]/50 mt-0.5">
-                    {isActive ? phase : 'Siap'}
-                  </span>
+                  {isActive && (
+                    <span className="text-[11px] font-semibold tracking-wider uppercase text-[#221F1F]/50 mt-0.5">
+                      {phase}
+                    </span>
+                  )}
                 </div>
               </div>
 
               {/* Reset & Cycle Indicator */}
-              <div className="flex items-center gap-4 mt-4">
-                <span className="text-xs text-[#221F1F]/60">
-                  {completedCycles > 0 ? `${completedCycles} siklus selesai` : 'Latihan relaksasi mandiri'}
-                </span>
+              <div className="flex items-center gap-4 mt-4 min-h-[20px]">
+                {completedCycles > 0 && (
+                  <span className="text-xs text-[#221F1F]/60">
+                    {completedCycles} siklus selesai
+                  </span>
+                )}
                 {isActive && (
                   <button
                     onClick={resetExercise}
@@ -158,9 +162,11 @@ export const BreathingSection: React.FC<BreathingSectionProps> = ({ onGoToCurhat
             {/* Instruction and Controls */}
             <div className="md:col-span-7 flex flex-col justify-center text-left">
               <div className="mb-6">
-                <span className="text-xs font-bold uppercase tracking-wider text-[#4A3E7D] font-geometric">
-                  {isActive ? `Fase: ${phase}` : 'Panduan Sederhana'}
-                </span>
+                {isActive && (
+                  <span className="text-xs font-bold uppercase tracking-wider text-[#4A3E7D] font-geometric">
+                    Fase: {phase}
+                  </span>
+                )}
                 <h3 className="font-geometric text-xl sm:text-2xl font-bold text-[#221F1F] mt-1 mb-2">
                   {isActive ? currentInfo.title : 'Ambil Posisi Duduk yang Nyaman'}
                 </h3>
@@ -188,11 +194,11 @@ export const BreathingSection: React.FC<BreathingSectionProps> = ({ onGoToCurhat
               </div>
 
               {/* Action Buttons */}
-              <div className="flex items-center gap-3">
+              <div className="flex flex-wrap sm:flex-nowrap items-center gap-3">
                 <button
                   type="button"
                   onClick={toggleExercise}
-                  className={`inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl text-sm font-bold transition-all duration-300 ease-in-out cursor-pointer shadow-xs hover:shadow-md active:scale-95 ${
+                  className={`inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl text-sm font-bold transition-all duration-300 ease-in-out cursor-pointer shadow-xs hover:shadow-md active:scale-95 whitespace-nowrap shrink-0 ${
                     isActive
                       ? 'bg-white text-[#221F1F] hover:bg-white/80 border border-[#4A3E7D]/10'
                       : 'bg-[#4A3E7D] text-white hover:bg-[#3D3268]'
@@ -200,13 +206,13 @@ export const BreathingSection: React.FC<BreathingSectionProps> = ({ onGoToCurhat
                 >
                   {isActive ? (
                     <>
-                      <Pause className="w-4 h-4" />
-                      <span>Jeda Latihan</span>
+                      <Pause className="w-4 h-4 shrink-0" />
+                      <span className="whitespace-nowrap">Jeda Latihan</span>
                     </>
                   ) : (
                     <>
-                      <Play className="w-4 h-4" />
-                      <span>Mulai Napas 4-7-8</span>
+                      <Play className="w-4 h-4 shrink-0" />
+                      <span className="whitespace-nowrap">Mulai Napas 4-7-8</span>
                     </>
                   )}
                 </button>
@@ -215,9 +221,9 @@ export const BreathingSection: React.FC<BreathingSectionProps> = ({ onGoToCurhat
                   <button
                     type="button"
                     onClick={onGoToCurhat}
-                    className="inline-flex items-center gap-1.5 px-4 py-3 rounded-xl text-xs font-semibold text-[#4A3E7D] hover:bg-[#4A3E7D]/8 transition cursor-pointer"
+                    className="inline-flex items-center gap-1.5 px-4 py-3 rounded-xl text-xs font-semibold text-[#4A3E7D] hover:bg-[#4A3E7D]/8 transition cursor-pointer whitespace-nowrap shrink-0"
                   >
-                    <span>Masih terasa cemas? Curhat di sini</span>
+                    <span className="whitespace-nowrap">Masih terasa cemas? Curhat di sini</span>
                   </button>
                 )}
               </div>
