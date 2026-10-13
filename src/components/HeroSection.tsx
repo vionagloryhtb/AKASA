@@ -1,6 +1,7 @@
-import React from 'react';
-import { ArrowDown, Shield, HeartHandshake, BookOpen } from 'lucide-react';
-import { BreathingExercise } from './BreathingExercise';
+import React, { useState, useEffect } from 'react';
+import { Check, ShieldCheck } from 'lucide-react';
+import { HeroInteractiveVisual } from './HeroInteractiveVisual';
+import { HeroQuickToolsCard } from './HeroQuickToolsCard';
 
 interface HeroSectionProps {
   onStartScreening: () => void;
@@ -9,100 +10,116 @@ interface HeroSectionProps {
 
 export const HeroSection: React.FC<HeroSectionProps> = ({
   onStartScreening,
-  onExploreLiteracy
+  onExploreLiteracy,
 }) => {
+  const line2Prefix = 'Kenali & Kelola ';
+  const [typedLine2, setTypedLine2] = useState('');
+  const [isTypingDone, setIsTypingDone] = useState(false);
+
+  // Smooth, silent typewriter text animation for line 2 of headline (~500ms)
+  useEffect(() => {
+    let index = 0;
+    const interval = setInterval(() => {
+      index += 2;
+      if (index <= line2Prefix.length) {
+        setTypedLine2(line2Prefix.slice(0, index));
+      } else {
+        setTypedLine2(line2Prefix);
+        setIsTypingDone(true);
+        clearInterval(interval);
+      }
+    }, 40);
+
+    return () => clearInterval(interval);
+  }, []);
+
   return (
     <section
       id="hero-section"
-      className="relative pt-8 pb-16 md:pt-16 md:pb-24 overflow-hidden bg-[#FAF8F6]"
+      className="relative py-16 md:py-24 overflow-hidden bg-[#FAF8F5]"
     >
-      <div className="max-w-6xl mx-auto px-4 sm:px-6">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12 items-center">
-          {/* Left Column: Core Headline & Direct Actions */}
-          <div className="lg:col-span-7 text-left">
-            {/* Headline Utama with Warm Editorial Typography */}
-            <h1
-              id="hero-headline"
-              className="font-serif text-3xl sm:text-5xl lg:text-5.5xl font-bold text-[#221F1F] tracking-tight leading-[1.18] sm:leading-[1.14] mb-6"
-            >
-              AKASA: Ruang Aman untuk Kenali & Kelola{' '}
-              <span className="text-[#6851A4] italic underline decoration-[#6851A4]/30 underline-offset-8">
-                Stres Akademikmu
-              </span>
-            </h1>
+      {/* 4. AMBIENT BACKGROUND GLOW (Cahaya Latar Organik di z-index: 0 & overflow: hidden) */}
+      <div
+        className="absolute -top-16 -left-16 w-[450px] h-[450px] rounded-full bg-[#E8E2F7] opacity-30 pointer-events-none z-0"
+        style={{ filter: 'blur(120px)' }}
+        aria-hidden="true"
+      />
+      <div
+        className="absolute -bottom-16 -right-16 w-[400px] h-[400px] rounded-full bg-[#E0F2E9] opacity-20 pointer-events-none z-0"
+        style={{ filter: 'blur(100px)' }}
+        aria-hidden="true"
+      />
 
-            {/* Sub-Headline (Strictly Preserved) */}
-            <p
-              id="hero-subheadline"
-              className="text-base sm:text-lg text-[#221F1F]/75 max-w-xl font-normal leading-relaxed mb-8"
-            >
-              Media belajar sekaligus asisten AI privat yang terbuka untuk membantu siswa SMA mengenali emosi dan menemukan langkah penanganan yang tepat bagi dirinya.
-            </p>
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 relative z-10">
+        
+        {/* 1. SECTION ATAS: Centered Header (Rata Tengah) */}
+        <div className="text-center max-w-3xl mx-auto mb-14 sm:mb-18">
+          {/* Kicker label */}
+          <p className="text-xs sm:text-sm font-bold tracking-widest text-[#4A3E7D] uppercase mb-3.5 font-geometric">
+            Psikoedukasi & Ruang Refleksi Remaja
+          </p>
 
-            {/* CTA Buttons */}
-            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3.5 mb-10">
-              <button
-                id="hero-cta-screening-btn"
-                onClick={onStartScreening}
-                className="inline-flex items-center justify-center gap-2 px-7 py-3.5 rounded-full bg-[#6851A4] text-white text-base font-bold shadow-sm hover:bg-[#574193] hover:shadow-md active:scale-98 transition-all cursor-pointer group"
-              >
-                <span>Mulai Cerita & Skrining</span>
-                <ArrowDown className="w-4 h-4 group-hover:translate-y-0.5 transition-transform" />
-              </button>
-
-              <button
-                id="hero-secondary-btn"
-                onClick={onExploreLiteracy}
-                className="inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-full bg-white text-[#221F1F]/85 text-base font-bold border border-[#221F1F]/12 hover:bg-[#FAF8F6] hover:border-[#221F1F]/25 active:scale-98 transition-all cursor-pointer shadow-xs"
-              >
-                <BookOpen className="w-4 h-4 text-[#6851A4]" />
-                <span>Pelajari 5 Respon Emosi</span>
-              </button>
-            </div>
-
-            {/* Humanized Reassurance Note */}
-            <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-xs text-[#221F1F]/65 pt-4 border-t border-[#221F1F]/8">
-              <span className="flex items-center gap-1.5 font-semibold text-[#221F1F]/85">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-600"></span>
-                Kerahasiaan Terjamin
-              </span>
-              <span className="text-[#221F1F]/30">•</span>
-              <span>Tanpa Akun & Tanpa Penilaian</span>
-              <span className="text-[#221F1F]/30">•</span>
-              <span>100% Gratis untuk Pelajar</span>
-            </div>
-          </div>
-
-          {/* Right Column: Intimate Diary Card + Breathing Sanctuary */}
-          <div className="lg:col-span-5 space-y-4 text-left">
-            {/* Note from Student Desk */}
-            <div className="p-6 rounded-2xl bg-white border border-[#221F1F]/8 shadow-warm-card relative overflow-hidden">
-              <div className="flex items-center justify-between gap-2 mb-3 pb-3 border-b border-[#221F1F]/6">
-                <div className="flex items-center gap-2">
-                  <span className="w-2 h-2 rounded-full bg-[#6851A4]"></span>
-                  <span className="text-xs font-bold uppercase tracking-wider text-[#221F1F]/60">
-                    Catatan dari Meja Belajar
-                  </span>
-                </div>
-                <span className="text-[11px] font-mono text-[#221F1F]/50">
-                  SMA Unggul Del
+          {/* Headline Utama: Geometric Sans-Serif, Max 2 Baris, Tanpa Italic, Rata Tengah */}
+          <h1
+            id="hero-headline"
+            className="font-geometric text-3.5xl sm:text-4.5xl lg:text-[48px] xl:text-[52px] font-black text-[#221F1F] tracking-tight leading-[1.18] sm:leading-[1.2] mb-5 not-italic"
+          >
+            <span className="block">AKASA: Ruang Aman untuk</span>
+            <span className="block mt-1">
+              <span>{typedLine2}</span>
+              {!isTypingDone && (
+                <span className="inline-block w-1.5 h-8 sm:h-10 bg-[#4A3E7D] ml-1.5 animate-pulse align-middle" />
+              )}
+              {isTypingDone && (
+                <span className="text-[#4A3E7D] not-italic font-black inline-block">
+                  Stres Akademikmu
                 </span>
-              </div>
+              )}
+            </span>
+          </h1>
 
-              <blockquote className="font-serif italic text-[#221F1F]/85 text-sm sm:text-base leading-relaxed mb-4">
-                &ldquo;Terkadang kita bukan malas belajar, tapi baterai emosi kita yang sudah habis karena tuntutan tugas dan ujian yang tiada henti. Di AKASA, kamu boleh berhenti sejenak tanpa rasa bersalah.&rdquo;
-              </blockquote>
+          {/* Sub-Headline Deskripsi Singkat: Line-Height 1.6 untuk Kenyamanan Membaca */}
+          <p
+            id="hero-subheadline"
+            className="text-base sm:text-lg text-[#221F1F]/75 max-w-2xl mx-auto font-normal leading-[1.6] mb-8 font-sans"
+          >
+            Media pembelajaran sekaligus asisten AI pribadi yang siap membantu siswa SMA mengenali emosi dan menemukan langkah penanganan yang sesuai untuk dirinya.
+          </p>
 
-              <div className="flex items-center justify-between text-xs text-[#221F1F]/70 pt-2">
-                <span className="font-semibold text-[#221F1F]">Viona Glory Hutabarat</span>
-                <span className="text-[#6851A4] font-medium">Inisiator AKASA</span>
-              </div>
-            </div>
+          {/* 3 Badges Horizontal Rata Tengah dengan Palet Hangat & Organik */}
+          <div className="flex flex-wrap items-center justify-center gap-3">
+            <span className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-[#E2F1E8] text-[#1E7E45] border border-[#1E7E45]/20 text-xs font-semibold shadow-2xs">
+              <ShieldCheck className="w-3.5 h-3.5 text-[#1E7E45] stroke-[2.2]" />
+              <span>Kerahasiaan Terjaga</span>
+            </span>
 
-            {/* Interactive Breathing Exercise */}
-            <BreathingExercise />
+            <span className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-[#E8E2F7]/70 text-[#4A3E7D] border border-[#4A3E7D]/20 text-xs font-semibold shadow-2xs">
+              <Check className="w-3.5 h-3.5 text-[#4A3E7D] stroke-[2.5]" />
+              <span>Tanpa Registrasi</span>
+            </span>
+
+            <span className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-[#E8E2F7]/70 text-[#4A3E7D] border border-[#4A3E7D]/20 text-xs font-semibold shadow-2xs">
+              <Check className="w-3.5 h-3.5 text-[#4A3E7D] stroke-[2.5]" />
+              <span>Khusus Pelajar SMA</span>
+            </span>
           </div>
         </div>
+
+        {/* 2. SECTION BAWAH: 2-Column Dashboard yang Simetris & Equal Height */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-stretch max-w-5xl mx-auto">
+          
+          {/* KOLOM KIRI: Widget Psikoedukasi Spotlight */}
+          <div className="h-full">
+            <HeroQuickToolsCard onExploreLiteracy={onExploreLiteracy} />
+          </div>
+
+          {/* KOLOM KANAN: Preview Chat AI */}
+          <div className="h-full">
+            <HeroInteractiveVisual onStartScreening={onStartScreening} />
+          </div>
+
+        </div>
+
       </div>
     </section>
   );

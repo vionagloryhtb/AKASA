@@ -1,16 +1,18 @@
 import React, { useState, useRef } from 'react';
 import { EmotionType, ScreeningResult } from '../types';
 import { EMOTIONS, getEmotionById } from '../data/emotions';
-import { RotateCcw, Copy, Check, ShieldCheck, AlertCircle, CheckSquare, Square } from 'lucide-react';
+import { RotateCcw, Copy, Check, ShieldCheck, AlertCircle, CheckSquare, MessageCircle, HelpCircle, Heart, ArrowRight } from 'lucide-react';
 
 interface AkasaAIProps {
   selectedEmotion: EmotionType;
   onSelectEmotion: (emotion: EmotionType) => void;
+  onGoToEdukasi?: () => void;
 }
 
 export const AkasaAI: React.FC<AkasaAIProps> = ({
   selectedEmotion,
-  onSelectEmotion
+  onSelectEmotion,
+  onGoToEdukasi
 }) => {
   const [story, setStory] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -22,85 +24,53 @@ export const AkasaAI: React.FC<AkasaAIProps> = ({
   const outputRef = useRef<HTMLDivElement>(null);
 
   const quickStarters = [
-    'Tugas menumpuk & besok ulangan',
-    'Merasa tertinggal dari teman kelas',
-    'Kepala berat & kurang tidur',
-    'Cemas dengan ekspektasi orang tua'
+    'Tugas sekolah menumpuk bersamaan',
+    'Cemas menghadapi ulangan harian',
+    'Merasa burnout dan kehilangan motivasi',
+    'Takut mengecewakan orang tua',
+    'Lelah fisik tapi sulit tidur nyenyak'
   ];
 
   const handleScreeningSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!story.trim()) {
-      setErrorMsg('Tuliskan sedikit apa yang kamu rasakan atau alami hari ini.');
+      setErrorMsg('Tolong ceritakan sedikit apa yang sedang kamu rasakan ya...');
       return;
     }
 
-    setErrorMsg(null);
     setIsLoading(true);
+    setErrorMsg(null);
+    setResult(null);
 
     try {
       const response = await fetch('/api/screening', {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
         },
         body: JSON.stringify({
           emotion: selectedEmotion,
           story: story.trim()
-        })
+        }),
       });
 
       if (!response.ok) {
-        throw new Error('Gagal menghubungi AKASA AI');
+        throw new Error('Gagal menghubungi teman AI AKASA.');
       }
 
-      const data = await response.json();
-      setResult({
-        emotion: selectedEmotion,
-        emotionLabel: getEmotionById(selectedEmotion).label,
-        story: story.trim(),
-        notesForYou: data.notesForYou,
-        smallSteps: data.smallSteps || [],
-        timestamp: new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })
-      });
+      const data: ScreeningResult = await response.json();
+      setResult(data);
       setCompletedSteps({});
 
       setTimeout(() => {
         outputRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      }, 100);
-    } catch (err) {
-      console.error('Error calling AKASA AI screening:', err);
-      // Empathetic client fallback tailored for SMA students
-      const emotionMeta = getEmotionById(selectedEmotion);
-      const fallbackResult: ScreeningResult = {
-        emotion: selectedEmotion,
-        emotionLabel: emotionMeta.label,
-        story: story.trim(),
-        notesForYou: `Terima kasih sudah berani membuka ceritamu. Menghadapi situasi sekolah dengan perasaan ${emotionMeta.label.toLowerCase()} memang tidak mudah, dan kamu berhak merasa lelah atau cemas saat ini. Ingatlah bahwa nilai atau tugas yang sedang menumpuk tidak mendefinisikan seberapa berharganya dirimu sebagai manusia.`,
-        smallSteps: [
-          `Istirahat hening 10 menit: Lepaskan gadget dan buku, pejamkan mata, lalu tarik napas panjang perlahan sebanyak 5 kali.`,
-          `Pilah 1 hal paling kecil: Dari semua hal yang membebani, pilih satu saja yang bisa selesai dalam 5 menit, kesampingkan sisanya untuk hari ini.`,
-          `Minum air hangat & peregangan: Berdiri dari meja belajarmu, putar bahu ke belakang, dan rasakan kembali ketegangan di lehermu mulai mengendur.`
-        ],
-        timestamp: new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })
-      };
-
-      setResult(fallbackResult);
-      setCompletedSteps({});
-      setTimeout(() => {
-        outputRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      }, 100);
+      }, 150);
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : 'Terjadi kendala saat merespons cerita.';
+      setErrorMsg(`${message} Silakan coba lagi ya.`);
     } finally {
       setIsLoading(false);
     }
-  };
-
-  const handleCopyResult = () => {
-    if (!result) return;
-    const textToCopy = `[Catatan AKASA untuk Kamu]\n${result.notesForYou}\n\n[Langkah Kecil yang Bisa Kamu Coba]\n${result.smallSteps.map((s, i) => `${i + 1}. ${s}`).join('\n')}`;
-    navigator.clipboard.writeText(textToCopy);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
   };
 
   const handleReset = () => {
@@ -108,6 +78,15 @@ export const AkasaAI: React.FC<AkasaAIProps> = ({
     setResult(null);
     setErrorMsg(null);
     setCompletedSteps({});
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const handleCopyResult = () => {
+    if (!result) return;
+    const textToCopy = `[Refleksi Emosi AKASA - ${result.emotionIdentified.toUpperCase()}]\n\nPesan untukmu:\n"${result.notesForYou}"\n\nLangkah kecil yang bisa dicoba:\n${result.smallSteps.map((s, i) => `${i + 1}. ${s}`).join('\n')}\n\nPertanyaan Refleksi:\n"${result.reflectiveQuestion || '-'}"`;
+    navigator.clipboard.writeText(textToCopy);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
   };
 
   const toggleStepCompleted = (index: number) => {
@@ -126,258 +105,318 @@ export const AkasaAI: React.FC<AkasaAIProps> = ({
   };
 
   return (
-    <section
-      id="skrining-ai"
-      className="py-16 md:py-24 bg-[#FAF8F6] border-t border-[#221F1F]/6 scroll-mt-16"
-    >
-      <div className="max-w-3xl mx-auto px-4 sm:px-6">
-        {/* Section Header */}
-        <div className="text-center mb-10">
-          <p className="text-xs font-bold tracking-widest text-[#6851A4] uppercase mb-2">
-            Ruang Cerita Pribadi
-          </p>
-          <h2
-            id="screening-title"
-            className="font-serif text-2xl sm:text-4xl font-bold text-[#221F1F] tracking-tight mb-3"
-          >
-            Luapkan yang Mengganjal di Hatimu
-          </h2>
-          <p className="text-sm sm:text-base text-[#221F1F]/70 max-w-xl mx-auto leading-relaxed">
-            Tidak ada penilaian atau keharusan untuk terlihat sempurna. Tuliskan apa adanya apa yang sedang membebani pikiranmu belakangan ini.
-          </p>
-        </div>
-
-        {/* Main White Card Container */}
-        <div
-          id="akasa-ai-card-container"
-          className="bg-[#FFFFFF] rounded-2xl p-6 sm:p-10 shadow-warm-card border border-[#221F1F]/6 transition-all relative"
-        >
-          <form onSubmit={handleScreeningSubmit} className="space-y-8">
-            {/* Emotion Selector */}
-            <div id="step-1-container">
-              <div className="mb-3.5">
-                <label className="text-base sm:text-lg font-serif font-bold text-[#221F1F] block mb-1">
-                  Bagaimana suasana hatimu saat ini?
-                </label>
-                <p className="text-xs text-[#221F1F]/60">
-                  Pilih kondisi yang paling mendominasi agar respon terasa pas untukmu:
-                </p>
-              </div>
-
-              {/* 5 Pill Buttons */}
-              <div className="flex flex-wrap gap-2.5">
-                {EMOTIONS.map((item) => {
-                  const isSelected = selectedEmotion === item.id;
-                  return (
-                    <button
-                      key={item.id}
-                      type="button"
-                      id={`pill-emotion-${item.id}`}
-                      onClick={() => onSelectEmotion(item.id)}
-                      className={`px-4 py-2.5 rounded-full text-sm font-bold transition-all duration-200 cursor-pointer ${
-                        isSelected
-                          ? 'bg-[#6851A4] text-white shadow-sm ring-2 ring-[#6851A4]/30'
-                          : 'bg-[#FAF8F6] text-[#221F1F]/80 hover:bg-[#221F1F]/5 border border-[#221F1F]/8'
-                      }`}
-                    >
-                      {item.label}
-                    </button>
-                  );
-                })}
-              </div>
-
-              <p className="text-xs text-[#221F1F]/65 mt-2.5 pl-1">
-                Terpilih: <strong className="text-[#221F1F]">{getEmotionById(selectedEmotion).label}</strong> ({getEmotionById(selectedEmotion).indonesianTitle}) — {getEmotionById(selectedEmotion).description}
+    <div id="page-curhat" className="py-16 md:py-24 bg-[#FAF8F5]">
+      <div className="max-w-4xl mx-auto px-4 sm:px-6">
+        {/* Banner Penjelas Ruang Curhat: Soft Lavender Tint */}
+        <div className="mb-10 p-5 sm:p-6 rounded-3xl bg-[#F0EEF8]/80 border border-[#4A3E7D]/12 shadow-warm-card flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+          <div className="flex items-center gap-3">
+            <div className="p-3 rounded-2xl bg-[#4A3E7D] text-white shadow-xs shrink-0">
+              <MessageCircle className="w-5 h-5" />
+            </div>
+            <div>
+              <p className="text-xs font-bold uppercase tracking-wider text-[#4A3E7D] font-geometric">
+                Ruang Curhat & Refleksi Emosi
+              </p>
+              <p className="text-xs sm:text-sm text-[#221F1F]/70 mt-0.5 leading-[1.6]">
+                Ruang aman privat tanpa penghakiman. Respons hangat, personal, dan ringkas untuk layar HP.
               </p>
             </div>
+          </div>
 
-            {/* Story Input */}
-            <div id="step-2-container">
-              <div className="mb-2">
-                <label
-                  htmlFor="user-story-input"
-                  className="text-base sm:text-lg font-serif font-bold text-[#221F1F] block mb-1"
-                >
-                  Tumpahkan apa yang sedang kamu hadapi:
-                </label>
-                <p className="text-xs text-[#221F1F]/60">
-                  Boleh cerita tentang tugas sekolah, guru, ulangan, pertemanan asrama, atau sekadar rasa lelah yang sulit dijelaskan.
+          {onGoToEdukasi && (
+            <button
+              type="button"
+              onClick={onGoToEdukasi}
+              className="text-xs font-semibold text-[#4A3E7D] hover:underline self-end sm:self-auto cursor-pointer flex items-center gap-1 shrink-0"
+            >
+              <span>Lihat Materi Edukasi</span>
+              <ArrowRight className="w-3.5 h-3.5" />
+            </button>
+          )}
+        </div>
+
+        {/* Section Header: Modern Geometric Sans-Serif */}
+        <div className="text-center mb-10 md:mb-12">
+          <span className="text-xs font-bold tracking-widest text-[#4A3E7D] uppercase mb-2 block font-geometric">
+            Ruang Cerita Privat
+          </span>
+          <h1
+            id="screening-title"
+            className="font-geometric text-2xl sm:text-4xl font-extrabold text-[#221F1F] tracking-tight mb-3"
+          >
+            Tumpahkan Apapun yang Mengganjal di Hatimu
+          </h1>
+          <p className="text-sm sm:text-base text-[#221F1F]/70 max-w-xl mx-auto leading-[1.6]">
+            Tidak ada tuntutan untuk selalu kuat atau terlihat sempurna. Ceritakan apa adanya tentang sekolah, tugas, atau rasa lelahmu hari ini.
+          </p>
+        </div>
+
+        {/* Main Chat/Story Form Centered & Enlarged */}
+        <div className="max-w-3xl mx-auto">
+          <div
+            id="akasa-ai-card-container"
+            className="bg-white/95 rounded-3xl p-6 sm:p-10 shadow-soft-float border border-[#4A3E7D]/12 relative text-left"
+          >
+            <form onSubmit={handleScreeningSubmit} className="space-y-6">
+              {/* Emotion Selector */}
+              <div id="step-1-container">
+                <div className="mb-3">
+                  <label className="text-sm sm:text-base font-bold text-[#221F1F] block mb-1 font-geometric">
+                    1. Pilih emosi dominanmu saat ini:
+                  </label>
+                  <p className="text-xs text-[#221F1F]/60 leading-[1.6]">
+                    Membantu AKASA merespons dengan sudut pandang yang paling pas.
+                  </p>
+                </div>
+
+                {/* 5 Pill Buttons */}
+                <div className="flex flex-wrap gap-2">
+                  {EMOTIONS.map((item) => {
+                    const isSelected = selectedEmotion === item.id;
+                    return (
+                      <button
+                        key={item.id}
+                        type="button"
+                        id={`pill-emotion-${item.id}`}
+                        onClick={() => onSelectEmotion(item.id)}
+                        className={`px-3.5 py-2 rounded-full text-xs font-bold transition-all duration-300 ease-in-out cursor-pointer active:scale-95 ${
+                          isSelected
+                            ? 'text-white shadow-xs ring-2 scale-102'
+                            : 'bg-[#FAF8F5] text-[#221F1F]/80 hover:bg-[#4A3E7D]/10 hover:text-[#4A3E7D] border border-[#4A3E7D]/12'
+                        }`}
+                        style={
+                          isSelected
+                            ? {
+                                backgroundColor: item.accentColor.primary,
+                                borderColor: item.accentColor.primary,
+                              }
+                            : undefined
+                        }
+                      >
+                        {item.label}
+                      </button>
+                    );
+                  })}
+                </div>
+
+                <p className="text-xs text-[#221F1F]/65 mt-2.5 pl-0.5 leading-[1.6]">
+                  Terpilih: <strong className="text-[#221F1F] font-bold">{getEmotionById(selectedEmotion).label}</strong> ({getEmotionById(selectedEmotion).indonesianTitle}) : {getEmotionById(selectedEmotion).description}
                 </p>
               </div>
 
-              {/* High School Quick Starters */}
-              <div className="flex items-center gap-1.5 flex-wrap mb-3 pl-1">
-                <span className="text-[11px] text-[#221F1F]/50 font-medium">Bantuan kalimat awal:</span>
-                {quickStarters.map((qs, i) => (
-                  <button
-                    key={i}
-                    type="button"
-                    onClick={() => handleQuickStarterClick(qs)}
-                    className="text-[11px] px-2.5 py-1 rounded-full bg-[#FAF8F6] hover:bg-[#6851A4]/10 text-[#221F1F]/70 hover:text-[#6851A4] border border-[#221F1F]/8 transition cursor-pointer"
+              {/* Story Input */}
+              <div id="step-2-container">
+                <div className="mb-2.5">
+                  <label
+                    htmlFor="user-story-input"
+                    className="text-sm sm:text-base font-bold text-[#221F1F] block mb-1 font-geometric"
                   >
-                    + {qs}
-                  </button>
-                ))}
-              </div>
-
-              <div className="relative">
-                <textarea
-                  id="user-story-input"
-                  rows={5}
-                  value={story}
-                  onChange={(e) => setStory(e.target.value)}
-                  placeholder="Tulis apa saja yang ada di kepalamu saat ini, tidak perlu rapi atau tersusun..."
-                  className="w-full p-4 sm:p-5 rounded-xl border border-[#221F1F]/15 bg-[#FAF8F6]/50 text-[#221F1F] text-base placeholder:text-[#221F1F]/40 focus:outline-none focus:ring-2 focus:ring-[#6851A4]/30 focus:border-[#6851A4] focus:bg-white transition-all resize-y"
-                />
-              </div>
-
-              {errorMsg && (
-                <div className="flex items-center gap-2 mt-2 text-xs font-semibold text-rose-600">
-                  <AlertCircle className="w-4 h-4" />
-                  <span>{errorMsg}</span>
+                    2. Ceritakan apa yang sedang kamu alami:
+                  </label>
+                  <p className="text-xs text-[#221F1F]/60 leading-[1.6]">
+                    Tulis bebas apa saja: tugas, ulangan, pertemanan, atau rasa hampa yang sulit dijelaskan.
+                  </p>
                 </div>
-              )}
 
-              <div className="flex items-center justify-between mt-2 px-1 text-xs text-[#221F1F]/50">
-                <span className="flex items-center gap-1">
-                  <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" /> Ceritamu rahasia & privat
-                </span>
-                <span>{story.length} karakter</span>
-              </div>
-            </div>
+                {/* High School Quick Starters */}
+                <div className="flex items-center gap-1.5 flex-wrap mb-3">
+                  <span className="text-[11px] text-[#221F1F]/50 font-medium">Bantuan ide:</span>
+                  {quickStarters.map((qs, i) => (
+                    <button
+                      key={i}
+                      type="button"
+                      onClick={() => handleQuickStarterClick(qs)}
+                      className="text-[11px] px-2.5 py-1 rounded-full bg-[#FAF8F5] hover:bg-[#4A3E7D]/10 text-[#221F1F]/70 hover:text-[#4A3E7D] border border-[#4A3E7D]/12 transition-all duration-300 cursor-pointer"
+                    >
+                      + {qs}
+                    </button>
+                  ))}
+                </div>
 
-            {/* Action Button */}
-            <div id="step-3-action">
-              <button
-                type="submit"
-                id="submit-screening-btn"
-                disabled={isLoading}
-                className="w-full py-4 px-6 rounded-xl bg-[#6851A4] hover:bg-[#574193] text-white text-base sm:text-lg font-bold shadow-md hover:shadow-lg disabled:opacity-75 disabled:cursor-not-allowed transition-all cursor-pointer flex items-center justify-center gap-2.5 group active:scale-99"
-              >
-                {isLoading ? (
-                  <span className="inline-flex items-center gap-3">
-                    <span className="w-4 h-4 rounded-full border-2 border-white border-t-transparent animate-spin"></span>
-                    <span>AKASA sedang membaca ceritamu...</span>
-                  </span>
-                ) : (
-                  <span>Dengarkan Ceritaku & Temukan Solusi</span>
+                <div className="relative">
+                  <textarea
+                    id="user-story-input"
+                    rows={5}
+                    value={story}
+                    onChange={(e) => setStory(e.target.value)}
+                    placeholder="Ketik apa saja yang ada di kepalamu saat ini. Nggak perlu tersusun rapi atau takut salah..."
+                    className="w-full p-4 rounded-2xl border border-[#4A3E7D]/15 bg-[#FAF8F5]/60 text-[#221F1F] text-sm sm:text-base placeholder:text-[#221F1F]/40 focus:outline-none focus:ring-2 focus:ring-[#4A3E7D]/30 focus:border-[#4A3E7D] focus:bg-white transition-all resize-y leading-[1.6]"
+                  />
+                </div>
+
+                {errorMsg && (
+                  <div className="flex items-center gap-2 mt-2 text-xs font-semibold text-rose-600">
+                    <AlertCircle className="w-4 h-4" />
+                    <span>{errorMsg}</span>
+                  </div>
                 )}
-              </button>
-            </div>
-          </form>
 
-          {/* Output Area */}
-          {result && (
-            <div
-              ref={outputRef}
-              id="screening-output-container"
-              className="mt-10 pt-8 border-t border-[#221F1F]/10 animate-in fade-in slide-in-from-bottom-3 duration-500"
-            >
-              {/* Output Box (#FAF8F6 background as specified in prompt) */}
-              <div
-                id="screening-output-box"
-                className="p-6 sm:p-8 rounded-2xl bg-[#FAF8F6] border border-[#221F1F]/8 shadow-sm space-y-6"
-              >
-                {/* Header Tag */}
-                <div className="flex items-center justify-between border-b border-[#221F1F]/8 pb-4">
-                  <div>
-                    <span className="text-xs font-bold uppercase tracking-wider text-[#6851A4]">
-                      Tanggapan Hangat AKASA
-                    </span>
-                    <span className="text-[11px] text-[#221F1F]/50 ml-2">
-                      {result.timestamp}
-                    </span>
-                  </div>
-
-                  <div className="flex items-center gap-2">
-                    <button
-                      id="copy-result-btn"
-                      onClick={handleCopyResult}
-                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white text-xs font-semibold text-[#221F1F]/80 border border-[#221F1F]/10 hover:border-[#221F1F]/30 transition cursor-pointer shadow-xs"
-                    >
-                      {copied ? (
-                        <>
-                          <Check className="w-3.5 h-3.5 text-emerald-600" />
-                          <span>Tersalin</span>
-                        </>
-                      ) : (
-                        <>
-                          <Copy className="w-3.5 h-3.5" />
-                          <span>Salin Solusi</span>
-                        </>
-                      )}
-                    </button>
-
-                    <button
-                      id="reset-screening-btn"
-                      onClick={handleReset}
-                      className="inline-flex items-center gap-1 px-3 py-1.5 rounded-full bg-white text-xs font-semibold text-[#221F1F]/70 border border-[#221F1F]/10 hover:text-[#6851A4] transition cursor-pointer shadow-xs"
-                    >
-                      <RotateCcw className="w-3.5 h-3.5" />
-                      <span>Cerita Baru</span>
-                    </button>
-                  </div>
-                </div>
-
-                {/* Bagian 1: Catatan untuk Kamu */}
-                <div id="output-notes-section">
-                  <h3 className="font-serif text-lg sm:text-xl font-bold text-[#221F1F] mb-2.5">
-                    Catatan untuk Kamu:
-                  </h3>
-                  <div className="text-sm sm:text-base text-[#221F1F]/90 leading-relaxed bg-white p-4 sm:p-5 rounded-xl border border-[#221F1F]/6 font-serif italic">
-                    {result.notesForYou}
-                  </div>
-                </div>
-
-                {/* Bagian 2: Langkah Kecil yang Bisa Kamu Coba */}
-                <div id="output-steps-section">
-                  <div className="flex items-start justify-between gap-2 mb-3">
-                    <h3 className="font-serif text-lg sm:text-xl font-bold text-[#221F1F]">
-                      Langkah Kecil yang Bisa Kamu Coba:
-                    </h3>
-                    <span className="text-[11px] text-[#221F1F]/50 hidden sm:inline">
-                      Klik kotak untuk menandai yang sudah dicoba
-                    </span>
-                  </div>
-
-                  <div className="space-y-2.5">
-                    {result.smallSteps.map((step, idx) => {
-                      const isDone = !!completedSteps[idx];
-                      return (
-                        <div
-                          key={idx}
-                          onClick={() => toggleStepCompleted(idx)}
-                          className={`flex items-start gap-3 p-3.5 rounded-xl border transition-all cursor-pointer ${
-                            isDone
-                              ? 'bg-emerald-50/70 border-emerald-200 text-[#221F1F]/60 line-through'
-                              : 'bg-white border-[#221F1F]/6 text-[#221F1F]/90 hover:border-[#6851A4]/30'
-                          } text-sm leading-relaxed`}
-                        >
-                          <div className="shrink-0 mt-0.5">
-                            {isDone ? (
-                              <CheckSquare className="w-5 h-5 text-emerald-600" />
-                            ) : (
-                              <span className="w-5 h-5 rounded-full bg-[#6851A4]/10 text-[#6851A4] text-xs font-bold flex items-center justify-center">
-                                {idx + 1}
-                              </span>
-                            )}
-                          </div>
-                          <span className="flex-grow">{step}</span>
-                        </div>
-                      );
-                    })}
-                  </div>
-                </div>
-
-                {/* Footer encouragement inside card */}
-                <div className="pt-2 text-center text-xs text-[#221F1F]/60">
-                  Kamu tidak harus menyelesaikan semuanya hari ini. Satu tarikan napas dan satu langkah kecil sudah sangat cukup.
+                <div className="flex items-center justify-between mt-2 px-1 text-xs text-[#221F1F]/50">
+                  <span className="flex items-center gap-1">
+                    <ShieldCheck className="w-3.5 h-3.5 text-[#1E7E45]" /> Curhatan privat & aman
+                  </span>
+                  <span>{story.length} karakter</span>
                 </div>
               </div>
+
+              {/* Action Button */}
+              <div id="step-3-action">
+                <button
+                  type="submit"
+                  id="submit-screening-btn"
+                  disabled={isLoading}
+                  className="w-full py-3.5 px-6 rounded-2xl bg-[#4A3E7D] hover:bg-[#3D3268] text-white text-sm sm:text-base font-bold shadow-xs hover:shadow-md disabled:opacity-75 disabled:cursor-not-allowed transition-all duration-300 ease-in-out cursor-pointer flex items-center justify-center gap-2 group active:scale-99"
+                >
+                  {isLoading ? (
+                    <span className="inline-flex items-center gap-2.5">
+                      <span className="w-4 h-4 rounded-full border-2 border-white border-t-transparent animate-spin"></span>
+                      <span>AKASA sedang mendengarkan ceritamu...</span>
+                    </span>
+                  ) : (
+                    <span>Kirim Cerita & Temukan Langkah Tenang</span>
+                  )}
+                </button>
+              </div>
+            </form>
+
+            {/* Output Area (Mobile-Optimized, Concise & Empathetic) */}
+            {result && (
+              <div
+                ref={outputRef}
+                id="screening-output-container"
+                className="mt-8 pt-6 border-t border-[#4A3E7D]/10 animate-in fade-in slide-in-from-bottom-2 duration-300"
+              >
+                <div
+                  id="screening-output-box"
+                  className="p-6 sm:p-7 rounded-2xl bg-[#F0EEF8]/60 border border-[#4A3E7D]/12 space-y-5"
+                >
+                  {/* Header Tag */}
+                  <div className="flex items-center justify-between border-b border-[#4A3E7D]/10 pb-3">
+                    <div>
+                      <span className="text-xs font-bold uppercase tracking-wider text-[#4A3E7D] flex items-center gap-1.5 font-geometric">
+                        <Heart className="w-3.5 h-3.5 text-rose-500 fill-rose-500" />
+                        Respons Hangat AKASA
+                      </span>
+                      <span className="text-[11px] text-[#221F1F]/50 ml-5 block sm:inline sm:ml-2">
+                        Waktu refleksi: {result.timestamp}
+                      </span>
+                    </div>
+
+                    <div className="flex items-center gap-2">
+                      <button
+                        id="copy-result-btn"
+                        onClick={handleCopyResult}
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white text-xs font-semibold text-[#221F1F]/80 border border-[#4A3E7D]/15 hover:border-[#4A3E7D]/35 transition cursor-pointer shadow-xs"
+                      >
+                        {copied ? (
+                          <>
+                            <Check className="w-3.5 h-3.5 text-[#1E7E45]" />
+                            <span>Tersalin</span>
+                          </>
+                        ) : (
+                          <>
+                            <Copy className="w-3.5 h-3.5" />
+                            <span>Salin</span>
+                          </>
+                        )}
+                      </button>
+
+                      <button
+                        id="reset-screening-btn"
+                        onClick={handleReset}
+                        className="inline-flex items-center gap-1 px-3 py-1.5 rounded-full bg-white text-xs font-semibold text-[#221F1F]/70 border border-[#4A3E7D]/15 hover:text-[#4A3E7D] transition cursor-pointer shadow-xs"
+                      >
+                        <RotateCcw className="w-3.5 h-3.5" />
+                        <span>Ulangi</span>
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Validasi Emosi (Notes for You) */}
+                  <div id="output-notes-section">
+                    <h3 className="text-sm sm:text-base font-bold text-[#221F1F] mb-2 font-geometric">
+                      Pesan untuk Dirimu:
+                    </h3>
+                    <div className="text-xs sm:text-sm text-[#221F1F]/90 leading-[1.6] bg-white/95 p-4 sm:p-5 rounded-2xl border border-[#4A3E7D]/8 italic">
+                      &ldquo;{result.notesForYou}&rdquo;
+                    </div>
+                  </div>
+
+                  {/* Saran Coping Spesifik & Praktis */}
+                  <div id="output-steps-section">
+                    <div className="flex items-start justify-between gap-2 mb-2.5">
+                      <h3 className="text-sm sm:text-base font-bold text-[#221F1F] font-geometric">
+                        Saran Coping yang Bisa Kamu Coba Sekarang:
+                      </h3>
+                      <span className="text-[11px] text-[#221F1F]/50 hidden sm:inline">
+                        Centang jika sudah dicoba
+                      </span>
+                    </div>
+
+                    <div className="space-y-2">
+                      {result.smallSteps.map((step, idx) => {
+                        const isDone = !!completedSteps[idx];
+                        return (
+                          <div
+                            key={idx}
+                            onClick={() => toggleStepCompleted(idx)}
+                            className={`flex items-start gap-2.5 p-3.5 rounded-xl border transition-all cursor-pointer ${
+                              isDone
+                                ? 'bg-[#E2F1E8]/70 border-[#1E7E45]/20 text-[#221F1F]/60 line-through'
+                                : 'bg-white border-[#4A3E7D]/10 text-[#221F1F]/90 hover:border-[#4A3E7D]/30'
+                            } text-xs sm:text-sm leading-[1.6]`}
+                          >
+                            <div className="shrink-0 mt-0.5">
+                              {isDone ? (
+                                <CheckSquare className="w-4 h-4 text-[#1E7E45]" />
+                              ) : (
+                                <span className="w-4 h-4 rounded-full bg-[#4A3E7D]/10 text-[#4A3E7D] text-[11px] font-bold flex items-center justify-center">
+                                  {idx + 1}
+                                </span>
+                              )}
+                            </div>
+                            <span className="flex-grow">{step}</span>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  {/* Pertanyaan Panduan Reflektif di Akhir (1 Pertanyaan) */}
+                  {result.reflectiveQuestion && (
+                    <div id="output-reflection-section" className="p-4 rounded-2xl bg-white border border-[#4A3E7D]/20 shadow-xs">
+                      <div className="flex items-center gap-2 mb-1.5">
+                        <HelpCircle className="w-4 h-4 text-[#4A3E7D]" />
+                        <h4 className="text-xs font-bold uppercase tracking-wider text-[#4A3E7D] font-geometric">
+                          1 Pertanyaan Refleksi untuk Dirimu
+                        </h4>
+                      </div>
+                      <p className="text-xs sm:text-sm text-[#221F1F] italic leading-[1.6]">
+                        {result.reflectiveQuestion}
+                      </p>
+                    </div>
+                  )}
+
+                  <div className="pt-1 text-center text-xs text-[#221F1F]/60 leading-[1.6]">
+                    Satu helaan napas tenang dan satu langkah kecil sudah sangat berarti untuk hari ini.
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Prinsip Privasi Reassurance */}
+            <div className="mt-6 pt-5 border-t border-[#4A3E7D]/10 flex flex-col sm:flex-row items-center justify-between gap-2.5 text-xs text-[#221F1F]/65 text-center sm:text-left">
+              <span className="flex items-center gap-1.5 font-medium text-[#221F1F]/85">
+                <ShieldCheck className="w-4 h-4 text-[#1E7E45] shrink-0" />
+                <span>Prinsip Privasi: Ceritamu 100% rahasia dan tidak dipublikasikan ke siapapun.</span>
+              </span>
+              <span className="text-[11px] text-[#4A3E7D] font-semibold bg-[#E8E2F7] px-3 py-1 rounded-full border border-[#4A3E7D]/15">
+                Ruang Refleksi Privat
+              </span>
             </div>
-          )}
+          </div>
         </div>
       </div>
-    </section>
+    </div>
   );
 };
